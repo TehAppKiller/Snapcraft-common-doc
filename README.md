@@ -5,12 +5,32 @@
 
 # FAQ
 ### How to access /home folder ?
+- 1/ Canonical doesn't allow snaps to read base `home` folder (except special authorizations), but you can read subfolders owned by root with following trick
+- 2/ Daemon snaps can only write data in folders owned by `root`
+
 `removable-media` interface allows direct access to /media and /mnt folders\
-Easiest way to access your /home folder is by adding a symlink to your /media folder:
+Easiest way to access your /home subfolder is by mounting a bind in the /media folder:
 ```
-sudo ln -s /home/<username> /media/home
+sudo mkdir /home/$USER/myfolder
+sudo mount --bind /home/$USER/myfolder /media/home
 ```
-You can now access your /home folder in the app through `/media/home`.
+You can now access /home/$USER/myfolder in the app through `/media/home`.
+
+**To make it permanent**, this mount bind must be stored in /etc/fstab
+```
+sudo nano /etc/fstab
+```
+Add this line to the end of the file and make appropriate folders' modifications :
+```
+# Content of /etc/fstab
+
+/home/<your_username>/myfolder/      /media/home      none      bind      0      0
+```
+To apply changes without restarting the OS :
+```
+sudo mount -a
+sudo systemctl daemon-reload
+```
 
 # Building
 ## Contents
