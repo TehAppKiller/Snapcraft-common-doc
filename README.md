@@ -4,23 +4,29 @@
 - [Versionning](#Versionning)
 
 # FAQ
-### How to access /home folder ?
-- 1/ Canonical doesn't allow snaps to read base `home` folder (except special authorizations), but you can read subfolders owned by root with following trick
-- 2/ Daemon snaps can only write data in folders owned by `root`
+### How to access `/home` folder ?
+- 1/ Snap Applications are launched as `user` ; Snap Services/Deamons are always launched as `root`
+- 2/ Canonical allows snaps to read/write folders only from the one who launched the snap ; thus Applications are allowed to read/write in `user`-owned folders only ; Servics/Daemons are allowed to read/write in `root`-owned folders only.
+- 3/ Thus, for Services/Daemons Canonical doesn't allow snaps to read base `/home` folder (except special authorizations), but you can read subfolders owned by `root` with following trick:
 
-`removable-media` interface allows direct access to /media and /mnt folders\
-Easiest way to access your /home subfolder is by mounting a bind in the /media folder:
+`removable-media` interface allows direct access to `/media` and `/mnt` folders ; do not forget to connect it:
+```
+sudo snap connect <snap_name>:removable-media
+```
+
+Easiest way to access your `/home` subfolder is by mounting a bind in the `/media` folder:
 ```
 sudo mkdir /home/$USER/myfolder
+sudo mkdir -p /media/home
 sudo mount --bind /home/$USER/myfolder /media/home
 ```
-You can now access /home/$USER/myfolder in the app through `/media/home`.
+You can now access `/home/$USER/myfolder` in the app through `/media/home`.
 
-**To make it permanent**, this mount bind must be stored in /etc/fstab
+**To make it permanent**, this mount bind must be stored in `/etc/fstab`
 ```
 sudo nano /etc/fstab
 ```
-Add this line to the end of the file and make appropriate folders' modifications :
+Add this line to the end of the file with your appropriate folders' modifications :
 ```
 # Content of /etc/fstab
 
